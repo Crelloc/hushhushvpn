@@ -3,7 +3,7 @@ Open VPN automation using Terraform, Ansible, and Linode's cloud platform
 
 Converted [Angristan's](https://github.com/angristan/openvpn-install) VPN script to IaC
 
-Only Tested on Linux Mint 21.1 but should run on Linux and MAC
+Developed on Linux Mint 21.1 but should run on Linux and MAC
 
 ### Getting started
 
