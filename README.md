@@ -28,16 +28,25 @@ Developed on Linux Mint 21.1 but should run on Linux and MAC
 
 ```
 
-- Modify [terraform.tfvars](terraform.tfvars) for *token, root_pass, ssh_key, and ssh_private_key file path*
-    - with option to override other default variables
+- Modify [terraform.tfvars](terraform.tfvars) for *your linode api token, root_pass, ssh_key, and ssh_private_key file path*
+    - you can override other default variables for further customization
 - Modify [.env](.env) file for server configuration setting: *ENV_USER, ENV_PASSWORD, and CLIENT*
-    - with option to override other default variables
+    - you can override other default variables for further customization
 
-- Download and run [./index.sh](index.sh) script
+##### Download and run [./index.sh](index.sh) script
 
 ```
- git clone https://github.com/Crelloc/hushhushvpn.git && chmod +x ./index.sh && ./index.sh
+ git clone https://github.com/Crelloc/hushhushvpn.git
 
+```
+```
+chmod +x ./hushhushvpn/index.sh
+```
+```
+cd ./hushhushvpn
+```
+```
+./index.sh
 ```
 
 - After the build is done, you should have a vpn file (.ovpn) in the parent directory of this project's folder.
