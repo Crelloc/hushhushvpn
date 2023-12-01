@@ -36,3 +36,4 @@ terraform.rc
 # Ignore any downloaded openvpn files
 *.ovpn
 tfplan
+.env
