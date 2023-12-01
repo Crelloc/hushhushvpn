@@ -17,16 +17,3 @@ rm -f *.ovpn tfplan
 
 # Remove server from known hosts for encryption keys
 # The commands below this comment line will auto-create.
-
-
-ssh-keygen -f "/home/crelloc/.ssh/known_hosts" -R "172.233.157.155"
-
-ssh-keygen -f "/home/crelloc/.ssh/known_hosts" -R "172.233.136.161"
-
-ssh-keygen -f "/home/crelloc/.ssh/known_hosts" -R "172.233.24.45"
-
-ssh-keygen -f "/home/crelloc/.ssh/known_hosts" -R "172.233.157.155"
-
-ssh-keygen -f "/home/crelloc/.ssh/known_hosts" -R "172.233.155.112"
-
-ssh-keygen -f "/home/crelloc/.ssh/known_hosts" -R "172.233.155.207"
