@@ -33,7 +33,7 @@ Developed on Linux Mint 21.1 but should run on Linux and MAC
 - Modify [.env](.env) file for server configuration setting: *ENV_USER, ENV_PASSWORD, and CLIENT*
     - you can override other default variables for further customization
 
-##### Download and run [./index.sh](index.sh) script
+##### Download and run [./index.sh](index.sh) script:
 
 ```
  git clone https://github.com/Crelloc/hushhushvpn.git
