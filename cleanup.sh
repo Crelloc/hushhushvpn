@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
 # Destroy instance
-terraform destroy <<EOF
-yes
-EOF
+terraform destroy --auto-approve
 
 # Restore ssh config file and remove necessary files
 
