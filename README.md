@@ -20,7 +20,7 @@ Developed on Linux Mint 21.1 but should run on Linux and MAC
 
 - Generate an ssh private and public key on your local machine
     - Follow prompt to name and save keys to a folder location
-        - Create an **EMPTY PASSPHRASE**
+        - Create an **EMPTY PASSPHRASE** 
         - https://docs.acquia.com/cloud-platform/manage/ssh/getting-started-ssh/generate/
 
 ```
@@ -28,25 +28,56 @@ Developed on Linux Mint 21.1 but should run on Linux and MAC
 
 ```
 
-- Modify [terraform.tfvars](terraform.tfvars) for *your linode api token, root_pass, ssh_key, and ssh_private_key file path*
+- Modify [variables.tf](variables.tf) for *your linode api token, root_pass, ssh_key, and ssh_private_key file path, etc.*
+
+```
+variable "token" {
+    default = "linode_api_token"
+}
+
+variable "vpn_instances" {
+  default = [
+    {
+      image           = "linode/ubuntu22.04"
+      label           = "linode-miami-florida-us"
+      group           = "Terraform"
+      region          = "us-mia"
+      type            = "g6-standard-1"
+      swap_size       = 2048
+      vpn_client_name = "linode-miami-florida-us"
+      env_file_path   = "./env/.env-linode-miami"
+      authorized_keys = ["contents of public key. ex: cat linode_terraform_vpn_id_rsa.pub"]
+      ssh_private_key = "/home/user/.ssh/linode_terraform_vpn_id_rsa"
+      root_pass       = "TebK6CWUPkgLQZ8"
+    },
+   ...
+  ]
+}
+ 
+```
+
+- Modify [env/](env/) files for server configuration setting: *ENV_USER, ENV_PASSWORD, etc*
     - you can override other default variables for further customization
-- Modify [.env](.env) file for server configuration setting: *ENV_USER, ENV_PASSWORD, and CLIENT*
-    - you can override other default variables for further customization
-
-##### Download and run [./index.sh](index.sh) script:
 
 ```
- git clone https://github.com/Crelloc/hushhushvpn.git
+export ENV_USER="user"
+export ENV_PASSWORD="password"
+ ...
+```
+
+##### Download and run [./scripts/index.sh](scripts/index.sh) script:
 
 ```
-```
-chmod +x ./hushhushvpn/index.sh
-```
-```
-cd ./hushhushvpn
+ git clone https://github.com/Crelloc/linodevpn.git
 ```
 ```
-./index.sh
+chmod +x ./linodevpn/scripts/index.sh
+```
+```
+cd ./linodevpn
+```
+```
+./scripts/index.sh
 ```
 
 - After the build is done, you should have a vpn file (.ovpn) in the parent directory of this project's folder.
