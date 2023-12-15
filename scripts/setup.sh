@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-source /root/.env
+source /$USER/.env
 
 username="$ENV_USER"
 password="$ENV_PASSWORD"
@@ -18,13 +18,12 @@ echo "User $username created and added to sudo group"
 
 
 cd "/home/$username"                          && \
-cp /root/openvpn-install.sh .                  && \
-chmod +x ./openvpn-install.sh                 && \
+cp /$USER/openvpn-install.sh .                  && \
 chown $username:$username ./openvpn-install.sh
 
 if [ "$auto_install" == "y" ]; then
     ./openvpn-install.sh
-    mv /root/$CLIENT.ovpn /home/$username/
+    mv /$USER/$CLIENT.ovpn /home/$username/
 else
     echo "AUTO_INSTALL is set to $auto_install in the .env configuration file."
     echo "You must run openvpn-install.sh manually on your VPN server."
@@ -36,7 +35,7 @@ fi
 mkdir -p "/home/$username/.ssh"
 chown $username:$username "/home/$username/.ssh"
 
-cat /root/key.pub >> "/home/$username/.ssh/authorized_keys"
+cat /$USER/key.pub >> "/home/$username/.ssh/authorized_keys"
 chown $username:$username "/home/$username/.ssh/authorized_keys"
 
 # Disable root login

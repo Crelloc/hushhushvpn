@@ -40,12 +40,12 @@ resource "linode_instance" "vpn_instance" {
     }
 
     provisioner "file" {
-      source      = "setup.sh"
+      source      = "./scripts/setup.sh"
       destination = "/root/setup.sh"
     }
 
     provisioner "file" {
-      source      = "openvpn-install.sh"
+      source      = "./scripts/openvpn-install.sh"
       destination = "/root/openvpn-install.sh"
     }
 
@@ -59,12 +59,13 @@ resource "linode_instance" "vpn_instance" {
 
      provisioner "local-exec" {
       command = <<EOT
+        export ANSIBLE_CONFIG=./ansible/ansible.cfg
 
         ansible-playbook -u root -i '${self.ip_address},' \
         -e 'ansible_python_interpreter=/usr/bin/python3' \
         -e 'client_name=${self.label}' \
         --private-key '${each.value.ssh_private_key}' \
-        upgrade.yml
+        ./ansible/upgrade.yml
 
       EOT
     }
@@ -73,28 +74,28 @@ resource "linode_instance" "vpn_instance" {
       command = <<EOT
       echo ""
       echo "creating/updating the ssh config file to include our new vpn server"
-      echo "exporting env variables that sshConfig.sh will use"
+      echo "exporting env variables that ./scripts/sshConfig.sh will use"
       . "${each.value.env_file_path}"
       export VPN_LABEL=${self.label}
       export CLIENT=${self.label}
       export VPN_IP=${self.ip_address}
       export PRIV_KEY_PATH=${each.value.ssh_private_key}
 
-      chmod +x ./sshConfig.sh
-      bash ./sshConfig.sh
+      chmod +x ./scripts/sshConfig.sh
+      bash ./scripts/sshConfig.sh
       echo ""
       echo "you can now ssh into your vpn server using..."
       echo "ssh ${self.label}"
       echo "you can edit this file at: ~/.ssh/config"
 
       echo ""
-      echo "building ./cleanup.sh script"
-      echo "# ${self.label}:" >> ./cleanup.sh
-      echo "ssh-keygen -f \"/home/$USER/.ssh/known_hosts\" -R \"${self.ip_address}\"" >> ./cleanup.sh
-      chmod +x ./cleanup.sh
+      echo "building ./scripts/cleanup.sh script"
+      echo "# ${self.label}:" >> ./scripts/cleanup.sh
+      echo "ssh-keygen -f \"/home/$USER/.ssh/known_hosts\" -R \"${self.ip_address}\"" >> ./scripts/cleanup.sh
+      chmod +x ./scripts/cleanup.sh
       echo ""
       echo "You can delete the server instance by executing:"
-      echo "./cleanup.sh"
+      echo "./scripts/cleanup.sh"
       echo ""
       echo "Note:"
       echo "You will need to manually delete your private and public keys in ~/.ssh/ folder"
@@ -117,7 +118,7 @@ resource "null_resource" "cleanup_script" {
     when = destroy
 
     command = <<EOT
-    bash ./removeHost.sh
+    bash ./scripts/removeHost.sh
     EOT
 
     environment = {

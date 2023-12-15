@@ -32,5 +32,5 @@
     - name: Execute the script to setup vpn server
       environment:
         CLIENT: "{{ client_name }}"
-      command: bash /root/setup.sh
+      command: bash "/$USER/setup.sh"
  

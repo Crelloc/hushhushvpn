@@ -38,7 +38,8 @@ fi
 
 if [ "$auto_install" == "y" ]; then
     # Download your vpn configuration file
-
+    SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+    cd $SCRIPT_DIR && cd ..
     scp "$vpn_label:/home/$username/$client_name.ovpn" ./
 
     echo ""

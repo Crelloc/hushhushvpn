@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 # make scripts executable
-chmod +x *.sh
+chmod +x $SCRIPT_DIR/*.sh
 
 # Backup ssh config file or create one if it doesn't exist
 
@@ -12,5 +14,5 @@ else
 fi
 
 # Automate terraform commands to build infrastructure
-
+cd $SCRIPT_DIR && cd ..
 terraform init -input=false && terraform plan -out=tfplan -input=false && terraform apply -input=false tfplan
