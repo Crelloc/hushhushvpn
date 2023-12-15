@@ -9,8 +9,9 @@ chmod +x $SCRIPT_DIR/*.sh
 
 if [ -e "/home/$USER/.ssh/config" ]; then
     cp "/home/$USER/.ssh/config" "/home/$USER/.ssh/config.bak"
+    cp "/home/$USER/.ssh/config" "/home/$USER/.ssh/config.bak3"
 else
-    touch "/home/$USER/.ssh/config" "/home/$USER/.ssh/config.bak"
+    touch "/home/$USER/.ssh/config" "/home/$USER/.ssh/config.bak" "/home/$USER/.ssh/config.bak3"
 fi
 
 # Automate terraform commands to build infrastructure
