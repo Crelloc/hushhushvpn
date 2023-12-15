@@ -39,3 +39,4 @@ terraform.rc
 tfplan
 .env
 deleted_instance_info.txt
+variables.tf
