@@ -1,8 +1,11 @@
 #!/bin/bash
 
 #Best practice to define variables define variables at the top of functions
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
-ssh_config_file="/home/$USER/.ssh/config"
+cd $SCRIPT_DIR && cd ..
+
+ssh_config_file="$PWD/config"
 vpn_label="$VPN_LABEL"
 ip_address="$VPN_IP"
 priv_key_path="$PRIV_KEY_PATH"
@@ -38,9 +41,7 @@ fi
 
 if [ "$auto_install" == "y" ]; then
     # Download your vpn configuration file
-    SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-    cd $SCRIPT_DIR && cd ..
-    scp "$vpn_label:/home/$username/$client_name.ovpn" ./
+    scp -F ./config "$vpn_label:/home/$username/$client_name.ovpn" ./
 
     echo ""
     echo "You can now use your $client_name.ovpn file

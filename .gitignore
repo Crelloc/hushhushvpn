@@ -38,3 +38,4 @@ terraform.rc
 *.ovpn
 tfplan
 .env
+deleted_instance_info.txt
