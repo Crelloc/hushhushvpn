@@ -96,8 +96,8 @@ for better security.
 
 ### TODO
 
-- Modify terraform files to support multiple instance
-    - for example, any change to the terraform files will destroy the previous infrastructure
+- ~~Modify terraform files to support multiple instance~~
+    - ~~for example, any change to the terraform files will destroy the previous infrastructure~~
 - Add other cloud providers: AWS, Azure, etc
 - Scale VPN server with kubernetes
 
