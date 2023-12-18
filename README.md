@@ -80,7 +80,11 @@ cd ./linodevpn
 ./scripts/index.sh
 ```
 
-- After the build is done, you should have a vpn file (.ovpn) in the parent directory of this project's folder.
+- After the build is done, you should have vpn file(s) (.ovpn) in the login folder of this project's directory.
+- You can also remote login into your vpn server using the ssh config file located in the login folder:
+```
+ssh -F ./login/config "name_of_host_that's_listed_in_config"
+```
 
 ### Set up your device/ computer to connect to vpn server
 - Import the .ovpn file in your network settings or download openvpn connect: https://openvpn.net/client/
