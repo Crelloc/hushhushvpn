@@ -7,9 +7,9 @@ echo "Instance to be deleted hostname: $VPN_HOSTNAME" >> ./deleted_instance_info
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 
-cd $SCRIPT_DIR && cd ..
+cd $SCRIPT_DIR/../
 
-SSH_FILEPATH="$PWD/config"
+SSH_FILEPATH="$PWD/login/config"
 
 lineNum=$(grep -n -m 1 "$VPN_HOST" "$SSH_FILEPATH" | cut -d: -f1)
 sum=$(expr $lineNum + 4)
@@ -19,8 +19,8 @@ if [ -z "$lineNum" ]; then
     echo "VPN_HOST: $VPN_HOST is not found in SSH_FILEPATH: $SSH_FILEPATH."
 else
     echo "Deleting $VPN_HOST from $SSH_FILEPATH."
-    sed -i "$lines"'d' "$PWD/config"
+    sed -i "$lines"'d' "$SSH_FILEPATH"
     ssh-keygen -f /home/$USER/.ssh/known_hosts -R $VPN_HOSTNAME
-    cp "$PWD/config" "$PWD/config.bak"
-    rm -f "$VPN_HOST.ovpn"
+    cp "$SSH_FILEPATH" "$SSH_FILEPATH.bak"
+    rm -f "login/$VPN_HOST.ovpn"
 fi

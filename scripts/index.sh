@@ -6,12 +6,13 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 chmod +x $SCRIPT_DIR/*.sh
 
 # Backup ssh config file or create one if it doesn't exist
-cd $SCRIPT_DIR && cd ..
+cd $SCRIPT_DIR/../
+mkdir login
 
-if [ -e "$PWD/config" ]; then
-    cp "$PWD/config" "$PWD/config.bak"
+if [ -e "$PWD/login/config" ]; then
+    cp "$PWD/login/config" "$PWD/login/config.bak"
 else
-    touch "$PWD/config"
+    touch "$PWD/login/config"
 fi
 
 # Automate terraform commands to build infrastructure

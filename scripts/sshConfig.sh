@@ -2,10 +2,7 @@
 
 #Best practice to define variables define variables at the top of functions
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-
-cd $SCRIPT_DIR && cd ..
-
-ssh_config_file="$PWD/config"
+ssh_config_file="$PWD/login/config"
 vpn_label="$VPN_LABEL"
 ip_address="$VPN_IP"
 priv_key_path="$PRIV_KEY_PATH"
@@ -21,6 +18,10 @@ Host $vpn_label
 	HostName $ip_address
 "
 
+cd $SCRIPT_DIR/../
+
+echo ""
+echo "creating/updating the ssh config file to include our new vpn server"
 
 # Check if the file exists
 if [ -e "$ssh_config_file" ]; then
@@ -41,7 +42,7 @@ fi
 
 if [ "$auto_install" == "y" ]; then
     # Download your vpn configuration file
-    scp -F ./config "$vpn_label:/home/$username/$client_name.ovpn" ./
+    scp -F ./login/config "$vpn_label:/home/$username/$client_name.ovpn" ./login
 
     echo ""
     echo "You can now use your $client_name.ovpn file
@@ -52,6 +53,10 @@ if [ "$auto_install" == "y" ]; then
 
     $client_name.ovpn is located in:
 
-    $PWD/$client_name.ovpn"
+    $PWD/login/$client_name.ovpn"
 
 fi
+
+echo ""
+echo "you can now ssh into your vpn server using..."
+echo "ssh -F $PWD/$LOGIN_FOLDER_NAME $client_name"

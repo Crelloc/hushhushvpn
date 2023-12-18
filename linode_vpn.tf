@@ -1,18 +1,19 @@
 terraform {
-    required_providers {
-        linode = {
-            source  = "linode/linode"
-            version = "1.27.1"
-        }
+  required_providers {
+    linode = {
+      source  = "linode/linode"
+      version = "1.27.1"
     }
+  }
 }
 
+
 provider "linode" {
-    token = var.token
+  token = var.token
 }
 
 resource "linode_instance" "vpn_instance" {
-  for_each = { for inst in var.vpn_instances : inst.label => inst }
+  for_each        = { for inst in var.vpn_instances : inst.label => inst }
   image           = each.value.image
   label           = each.value.label
   group           = each.value.group
@@ -21,109 +22,94 @@ resource "linode_instance" "vpn_instance" {
   swap_size       = each.value.swap_size
   authorized_keys = each.value.authorized_keys
   root_pass       = each.value.root_pass
-
-    connection {
-      type        = "ssh"
-      user        = "root"
-      private_key = file(each.value.ssh_private_key)
-      host        = self.ip_address
-    }
-
-    provisioner "file" {
-      source      = each.value.env_file_path
-      destination = "/root/.env"
-    }
-
-    provisioner "file" {
-      source      = "${each.value.ssh_private_key}.pub"
-      destination = "/root/key.pub"
-    }
-
-    provisioner "file" {
-      source      = "./scripts/setup.sh"
-      destination = "/root/setup.sh"
-    }
-
-    provisioner "file" {
-      source      = "./scripts/openvpn-install.sh"
-      destination = "/root/openvpn-install.sh"
-    }
-
-    provisioner "remote-exec" {
-      inline = [
-        "cat /etc/os-release",
-        "chmod +x /root/setup.sh",
-        "chmod +x /root/openvpn-install.sh"
-      ]
-    }
-
-     provisioner "local-exec" {
-      command = <<EOT
-        export ANSIBLE_CONFIG=./ansible/ansible.cfg
-
-        ansible-playbook -u root -i '${self.ip_address},' \
-        -e 'ansible_python_interpreter=/usr/bin/python3' \
-        -e 'client_name=${self.label}' \
-        --private-key '${each.value.ssh_private_key}' \
-        ./ansible/upgrade.yml
-
-      EOT
-    }
-
-    provisioner "local-exec" {
-      command = <<EOT
-      echo ""
-      echo "creating/updating the ssh config file to include our new vpn server"
-      echo "exporting env variables that ./scripts/sshConfig.sh will use"
-      . "${each.value.env_file_path}"
-      export VPN_LABEL=${self.label}
-      export CLIENT=${self.label}
-      export VPN_IP=${self.ip_address}
-      export PRIV_KEY_PATH=${each.value.ssh_private_key}
-
-      chmod +x ./scripts/sshConfig.sh
-      bash ./scripts/sshConfig.sh
-      echo ""
-      echo "you can now ssh into your vpn server using..."
-      echo "ssh ${self.label}"
-      echo "you can edit this file at: ~/.ssh/config"
-
-      echo ""
-      echo "building ./scripts/cleanup.sh script"
-      echo "# ${self.label}:" >> ./scripts/cleanup.sh
-      echo "ssh-keygen -f \"/home/$USER/.ssh/known_hosts\" -R \"${self.ip_address}\"" >> ./scripts/cleanup.sh
-      chmod +x ./scripts/cleanup.sh
-      echo ""
-      echo "You can delete the server instance by executing:"
-      echo "./scripts/cleanup.sh"
-      echo ""
-      echo "Note:"
-      echo "You will need to manually delete your private and public keys in ~/.ssh/ folder"
-      echo "...or reuse them."
-      EOT
-    }
 }
 
 resource "null_resource" "cleanup_script" {
-  for_each = { for inst in var.vpn_instances : inst.label => inst }
-
   depends_on = [linode_instance.vpn_instance]
 
+  for_each = { for inst in var.vpn_instances : inst.label => inst }
+
   triggers = {
-    vpn_host     = each.value.label
-    vpn_hostname = linode_instance.vpn_instance[each.value.label].ip_address
+    vpn_host     = each.key
+    vpn_hostname = linode_instance.vpn_instance[each.key].ip_address
   }
 
   provisioner "local-exec" {
     when = destroy
 
     command = <<EOT
-    bash ./scripts/removeHost.sh
+    ./scripts/lockScript.sh bash ./scripts/removeHost.sh
     EOT
 
     environment = {
-      VPN_HOST = "${self.triggers.vpn_host}"
+      VPN_HOST     = "${self.triggers.vpn_host}"
       VPN_HOSTNAME = "${self.triggers.vpn_hostname}"
     }
+  }
+}
+
+resource "null_resource" "setup_scripts" {
+  for_each   = { for inst in var.vpn_instances : inst.label => inst }
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    private_key = file(each.value.ssh_private_key)
+    host        = linode_instance.vpn_instance[each.key].ip_address
+  }
+
+  provisioner "file" {
+    source      = each.value.env_file_path
+    destination = "/root/.env"
+  }
+
+  provisioner "file" {
+    source      = "${each.value.ssh_private_key}.pub"
+    destination = "/root/key.pub"
+  }
+
+  provisioner "file" {
+    source      = "./scripts/setup.sh"
+    destination = "/root/setup.sh"
+  }
+
+  provisioner "file" {
+    source      = "./scripts/openvpn-install.sh"
+    destination = "/root/openvpn-install.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "cat /etc/os-release",
+      "chmod +x /root/setup.sh",
+      "chmod +x /root/openvpn-install.sh"
+    ]
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+        export ANSIBLE_CONFIG=./ansible/ansible.cfg
+
+        ansible-playbook -u root -i '${linode_instance.vpn_instance[each.key].ip_address},' \
+        -e 'ansible_python_interpreter=/usr/bin/python3' \
+        -e 'client_name=${each.key}' \
+        --private-key '${each.value.ssh_private_key}' \
+        ./ansible/upgrade.yml
+
+      EOT
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+
+      . "${each.value.env_file_path}"
+      export VPN_LABEL=${each.key}
+      export CLIENT=${each.key}
+      export VPN_IP=${linode_instance.vpn_instance[each.key].ip_address}
+      export PRIV_KEY_PATH=${each.value.ssh_private_key}
+
+      bash ./scripts/sshConfig.sh
+
+      EOT
   }
 }
